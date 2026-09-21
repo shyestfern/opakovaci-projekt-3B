@@ -4,16 +4,13 @@
 
 <?php
     $table = new \CodeIgniter\View\Table();
-    $table->setHeading("Název", "Datum");
+    $table->setHeading("Datum", "Délka", "Převýšení", "Typ");
 
-    /**@var array $zavod */
+    /**@var array $etapy */
 
-    foreach($zavod as $row){
-        $datum = $row->start_date . ' - ' . $row->end_date;
-
+    foreach($etapy as $row){
         $table->addRow(
-            anchor('etapy/'.$row->id, $row->real_name),
-            $datum
+            $row->date, $row->distance, $row->vertical_meters, $row->name
         );
     }
 

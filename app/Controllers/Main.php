@@ -25,7 +25,7 @@ class Main extends BaseController
         $id = 124;
 
         $zavod = $this->raceYear
-        ->select('race_year.id_race, race_year.real_name, race_year.start_date, race_year.end_date')
+        ->select('race_year.id, race_year.id_race, race_year.real_name, race_year.start_date, race_year.end_date')
         ->where('race_year.id_race', $id)
         ->orderBy('race_year.year', 'desc')
         ->findAll();
@@ -35,5 +35,19 @@ class Main extends BaseController
         ];
 
         echo view('index', $this->data);
+    }
+
+    public function etapy($id){
+        $etapy = $this->raceYear
+        ->join('stage', 'race_year.id = stage.id_race_year', 'inner')
+        ->join('parcour_type', 'stage.parcour_type = parcour_type.id', 'inner')
+        ->where('stage.id_race_year', $id)
+        ->findAll();
+
+        $this->data = [
+            'etapy' => $etapy
+        ];
+
+        echo view('etapy', $this->data);
     }
 }
