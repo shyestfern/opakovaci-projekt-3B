@@ -39,9 +39,18 @@ class Main extends BaseController
 
     public function etapy($id){
         $etapy = $this->raceYear
+        ->select('stage.date, stage.distance, stage.vertical_meters, parcour_type.name, rider.first_name, rider.last_name, result.team_link')
         ->join('stage', 'race_year.id = stage.id_race_year', 'inner')
         ->join('parcour_type', 'stage.parcour_type = parcour_type.id', 'inner')
-        ->where('stage.id_race_year', $id)
+        ->join('result', 'stage.id = result.id_stage', 'inner')
+        ->join('rider', 'result.id_rider = rider.id', 'left') // změna na left join kvůli id_rider = 0 v TTT
+        ->where('race_year.id', $id)
+        ->where('result.rank', 1)
+        ->groupStart() // začátek skupiny podmínek
+            ->where('result.type_result', 1) // klasická etapa
+            ->orWhere('result.type_result', 3) // časovka družstev
+        ->groupEnd()
+        ->orderBy('stage.number', 'asc')
         ->findAll();
 
         $this->data = [
