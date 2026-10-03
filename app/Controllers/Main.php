@@ -8,10 +8,12 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Models\RaceYear;
+use App\Models\Stage;
 
 class Main extends BaseController
 {
     private object $raceYear;
+    private object $stage;
     private array $data;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
@@ -19,6 +21,7 @@ class Main extends BaseController
         parent::initController($request, $response, $logger);
 
         $this->raceYear = new RaceYear();
+        $this->stage = new Stage();
     }
 
     public function index(){
@@ -29,6 +32,19 @@ class Main extends BaseController
         ->where('race_year.id_race', $id)
         ->orderBy('race_year.year', 'desc')
         ->findAll();
+
+        foreach($zavod as $row){
+            $etapyRocniku = $this->stage
+            ->where('stage.id_race_year', $row->id)
+            ->findAll();
+
+            $celkovaDelka = 0;
+            foreach($etapyRocniku as $etapa){
+                $celkovaDelka += $etapa->distance;
+            }
+
+            $row->total_distance = round($celkovaDelka);
+        }
 
         $this->data = [
             'zavod' => $zavod

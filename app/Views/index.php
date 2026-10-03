@@ -4,16 +4,18 @@
 
 <?php
     $table = new \CodeIgniter\View\Table();
-    $table->setHeading("Název", "Datum");
+    $table->setHeading("Název", "Datum", "Celková délka");
 
     /**@var array $zavod */
 
     foreach($zavod as $row){
         $datum = $row->start_date . ' - ' . $row->end_date;
+        $delka = $row->total_distance . ' km';
 
         $table->addRow(
             anchor('etapy/'.$row->id, $row->real_name),
-            $datum
+            $datum,
+            $delka
         );
     }
 
