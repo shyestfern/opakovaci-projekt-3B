@@ -4,33 +4,15 @@
 
 <?php
     $table = new \CodeIgniter\View\Table();
-    $table->setHeading("Datum", "Délka", "Převýšení", "Typ", "Vítěz", "Pořadí");
+    $table->setHeading("Pořadí", "Jméno", "Čas");
 
-    /**@var array $etapy */
+    /**@var array $poradi */
 
-    foreach($etapy as $row){
-        $vitez = '';
-
-        if (!empty($row->first_name)) {
-            $vitez = $row->first_name . " " . $row->last_name;
-        }
-        else {
-            $teamBezLomitka = basename($row->team_link); // vrátí znaky na konci po '/'
-            $teamBezRoku = substr($teamBezLomitka, 0, -5);
-            $teamBezSpojovniku = str_replace('-', ' ', $teamBezRoku);
-            $vitez = ucwords($teamBezSpojovniku) . " (TTT)"; // převede první písmena slov na velké
-        }
-
-        $odkazVEtape = anchor('poradi/' . $row->id . '/1', 'V etapě');
-        $odkazPoEtape = anchor('poradi/' . $row->id . '/4', 'Po etapě');
+    foreach($poradi as $row){
+        
 
         $table->addRow(
-            $row->date, 
-            $row->distance . " km", 
-            $row->vertical_meters . " m", 
-            $row->name, 
-            $vitez,
-            $odkazVEtape . " " . $odkazPoEtape
+            
         );
     }
 
