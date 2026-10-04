@@ -9,10 +9,43 @@
     /**@var array $poradi */
 
     foreach($poradi as $row){
-        
+        $formatPoradi = '';
+
+        if ($row->rank > 0) {
+            $formatPoradi = $row->rank . ".";
+        }
+        else {
+            $formatPoradi = '-';
+        }
+
+        $jmeno = '';
+
+        if (!empty($row->first_name)) {
+            $jmeno = $row->first_name . " " . $row->last_name;
+        }
+        else {
+            $teamBezLomitka = basename($row->team_link); // vrátí znaky na konci po '/'
+            $teamBezRoku = substr($teamBezLomitka, 0, -5);
+            $teamBezSpojovniku = str_replace('-', ' ', $teamBezRoku);
+            $jmeno = ucwords($teamBezSpojovniku); // převede první písmena slov na velké
+        }
+
+        $casNeboNote = '';
+
+        if ($row->time != null && $row->time != '00:00:00') {
+            $casNeboNote = $row->time;
+        }
+        else if (!empty($row->note)) {
+            $casNeboNote = $row->note;
+        }
+        else {
+            $casNeboNote = '-';
+        }
 
         $table->addRow(
-            
+            $formatPoradi,
+            $jmeno,
+            $casNeboNote
         );
     }
 

@@ -81,15 +81,29 @@ class Main extends BaseController
 
     public function poradi($id_stage, $type_result){
         $poradi = $this->result
-        ->select('result.rank, result.team_link, rider.first_name, rider.last_name, result.time')
+        ->select('result.rank, result.team_link, rider.first_name, rider.last_name, result.time, result.note')
         ->join('rider', 'result.id_rider = rider.id', 'left')
         ->where('result.id_stage', $id_stage)
         ->where('result.type_result', $type_result)
         ->orderBy('rank', 'asc')
         ->findAll();
 
+        $vysledkySCasem = [];
+        $vysledkyBezCasu = [];
+
+        foreach($poradi as $row){
+            if ($row->time == null || $row->time == '00:00:00') {
+                $vysledkyBezCasu[] = $row;
+            }
+            else {
+                $vysledkySCasem[] = $row;
+            }
+        }
+
+        $finalniPoradi = array_merge($vysledkySCasem, $vysledkyBezCasu);
+
         $this->data = [
-            'poradi' => $poradi
+            'poradi' => $finalniPoradi
         ];
 
         echo view('poradi', $this->data);
