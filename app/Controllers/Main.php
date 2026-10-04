@@ -10,13 +10,14 @@ use Psr\Log\LoggerInterface;
 use App\Models\RaceYear;
 use App\Models\Stage;
 use App\Models\Result;
+use App\Models\Race;
 
 class Main extends BaseController
 {
     private object $raceYear;
     private object $stage;
     private object $result;
-    private array $data;
+    private object $race;
 
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
@@ -25,6 +26,7 @@ class Main extends BaseController
         $this->raceYear = new RaceYear();
         $this->stage = new Stage();
         $this->result = new Result();
+        $this->race = new Race();
     }
 
     public function index(){
@@ -107,5 +109,57 @@ class Main extends BaseController
         ];
 
         echo view('poradi', $this->data);
+    }
+
+    function pridat(){
+        $zavody = $this->race
+        ->join('race_year', 'race.id = race_year.id_race', 'inner')
+        ->where('race_year.category', 'E')
+        ->where('race_year.sex', 'M')
+        ->distinct()
+        ->orderBy('race.id', 'asc')
+        ->findAll();
+
+        $dropdown = ['default' => 'Vyberte závod'];
+        foreach($zavody as $zavod){
+            $dropdown[$zavod->id] = $zavod->default_name . ' (' . $zavod->country . ')';
+        }
+
+        $this->data += [
+            'zavody' => $dropdown
+        ];
+
+        echo view('formular', $this->data);
+    }
+
+    function vytvorit(){
+        $logo = $this->request->getFile('logo');
+        $real_name = $this->request->getPost('real_name');
+        $id_race = $this->request->getPost('id_race');
+
+        $uploadKnihovna = new \App\Libraries\FileUpload();
+        $uploadLogo = $uploadKnihovna->uploadFile($logo, 'logos/', 'logo_' . time());
+
+        if ($uploadLogo['uploaded']) { 
+            $data = array(
+                'logo' => $uploadLogo['name'],
+                'real_name' => $real_name,
+                'id_race' => $id_race,
+                'category' => 'E', // Nastavíme jako výchozí dle kontextu zadání
+                'sex' => 'M'       // Nastavíme jako výchozí dle kontextu zadání
+            );
+
+            $alertKnihovna = new \App\Libraries\Alert();
+            $vysledek = $this->raceYear->save($data);
+
+            $alert = $alertKnihovna->makeMessage($vysledek, 'dbAdd');
+            session()->setFlashdata('alert', $alert);
+
+            return redirect()->route('/');
+        }
+        else {
+            return redirect()->route('/');
+        }
+
     }
 }

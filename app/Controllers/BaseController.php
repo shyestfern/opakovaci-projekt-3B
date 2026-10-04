@@ -25,7 +25,9 @@ abstract class BaseController extends Controller
      * The creation of dynamic property is deprecated in PHP 8.2.
      */
 
-    // protected $session;
+    protected $session;
+    protected $alert;
+    protected $data;
 
     /**
      * @return void
@@ -36,10 +38,23 @@ abstract class BaseController extends Controller
         // Caution: Do not put the this below the parent::initController() call below.
         // $this->helpers = ['form', 'url'];
 
+        $this->helpers = ['html', 'my_form', 'form'];
+
         // Caution: Do not edit this line.
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.
         // $this->session = service('session');
+
+        $this->session = session();
+
+        $this->alert = new \stdClass();
+        $this->alert->message = '';
+        $this->alert->class = '';
+        $this->data['alert'] = $this->alert;
+
+        if($this->session->has('alert')){
+            $this->data['alert'] = $this->session->getFlashdata('alert');
+        }
     }
 }
