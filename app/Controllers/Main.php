@@ -31,11 +31,12 @@ class Main extends BaseController
 
     public function index(){
         $id = 124;
+        $posledniZaznam = 12283;
 
         $zavod = $this->raceYear
         ->select('race_year.id, race_year.id_race, race_year.real_name, race_year.start_date, race_year.end_date')
         ->where('race_year.id_race', $id)
-        ->orWhere('race_year.id', 0)
+        ->orWhere('race_year.id >', $posledniZaznam)
         ->orderBy('race_year.year', 'desc')
         ->findAll();
 
