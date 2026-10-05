@@ -86,6 +86,7 @@ php_errors.log
 #-------------------------
 vendor/
 node_modules/
+logos/
 
 #-------------------------
 # IDE / Development Files
