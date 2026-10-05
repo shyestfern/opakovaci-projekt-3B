@@ -35,20 +35,26 @@ class Main extends BaseController
         $zavod = $this->raceYear
         ->select('race_year.id, race_year.id_race, race_year.real_name, race_year.start_date, race_year.end_date')
         ->where('race_year.id_race', $id)
+        ->orWhere('race_year.id', 0)
         ->orderBy('race_year.year', 'desc')
         ->findAll();
 
         foreach($zavod as $row){
-            $etapyRocniku = $this->stage
-            ->where('stage.id_race_year', $row->id)
-            ->findAll();
+            if (isset($this->stage)) {
+                $etapyRocniku = $this->stage
+                ->where('stage.id_race_year', $row->id)
+                ->findAll();
 
-            $celkovaDelka = 0;
-            foreach($etapyRocniku as $etapa){
-                $celkovaDelka += $etapa->distance;
+                $celkovaDelka = 0;
+                foreach($etapyRocniku as $etapa){
+                    $celkovaDelka += $etapa->distance;
+                }
+
+                $row->total_distance = round($celkovaDelka);
             }
-
-            $row->total_distance = round($celkovaDelka);
+            else {
+                $row->total_distance = 0;
+            }
         }
 
         $this->data = [
@@ -137,6 +143,11 @@ class Main extends BaseController
         $real_name = $this->request->getPost('real_name');
         $id_race = $this->request->getPost('id_race');
 
+        $start_date = $this->request->getPost('start_date');
+        $end_date = $this->request->getPost('end_date');
+        
+        $year = !empty($start_date) ? substr($start_date, 0, 4) : 2026;
+
         $uploadKnihovna = new \App\Libraries\FileUpload();
         $uploadLogo = $uploadKnihovna->uploadFile($logo, 'logos/', 'logo_' . time());
 
@@ -145,8 +156,11 @@ class Main extends BaseController
                 'logo' => $uploadLogo['name'],
                 'real_name' => $real_name,
                 'id_race' => $id_race,
-                'category' => 'E', // Nastavíme jako výchozí dle kontextu zadání
-                'sex' => 'M'       // Nastavíme jako výchozí dle kontextu zadání
+                'category' => 'E',
+                'sex' => 'M',
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'year' => $year
             );
 
             $alertKnihovna = new \App\Libraries\Alert();

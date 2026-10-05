@@ -44,4 +44,10 @@
     echo $table->generate();
 ?>
 
+<div class="text-center my-3">
+    <a href="<?= site_url('polozka/pridat') ?>" class="btn btn-success">
+        + Přidat ročník
+    </a>
+</div>
+
 <?= $this->endSection() ?>
