@@ -33,29 +33,25 @@ class Main extends BaseController
         $id = 124;
         $posledniZaznam = 12283;
 
-        $zavod = $this->raceYear
+        $zavod = $this->race
         ->select('race_year.id, race_year.id_race, race_year.real_name, race_year.start_date, race_year.end_date')
-        ->where('race_year.id_race', $id)
+        ->join('race_year', 'race.id = race_year.id_race', 'inner')
+        ->where('race.id', $id)
         ->orWhere('race_year.id >', $posledniZaznam)
         ->orderBy('race_year.year', 'desc')
         ->findAll();
 
         foreach($zavod as $row){
-            if (isset($this->stage)) {
-                $etapyRocniku = $this->stage
-                ->where('stage.id_race_year', $row->id)
-                ->findAll();
+            $etapyRocniku = $this->stage
+            ->where('stage.id_race_year', $row->id)
+            ->findAll();
 
-                $celkovaDelka = 0;
-                foreach($etapyRocniku as $etapa){
-                    $celkovaDelka += $etapa->distance;
-                }
+            $celkovaDelka = 0;
+            foreach($etapyRocniku as $etapa){
+                $celkovaDelka += $etapa->distance;
+            }
 
-                $row->total_distance = round($celkovaDelka);
-            }
-            else {
-                $row->total_distance = 0;
-            }
+            $row->total_distance = round($celkovaDelka);
         }
 
         $this->data = [
